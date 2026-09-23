@@ -48,6 +48,7 @@ export function Testimonials() {
   const [testimonials, setTestimonials] = useState<Testimonial[]>(defaultTestimonials);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
+<<<<<<< HEAD
   useEffect(() => {
     let isMounted = true;
     getTeamMembers({ activeOnly: true })
@@ -75,6 +76,42 @@ export function Testimonials() {
       isMounted = false;
     };
   }, []);
+=======
+  const testimonials: Testimonial[] = [
+    {
+      id: '1',
+      quote: "Working with Buck & Bricks over the past 12 years has been an exceptional experience. As a business leader, finding the right executive talent is critical, and they have consistently delivered highest-quality candidate data and insights. Their precision and thorough approach make our hiring process seamless, efficient, and genuinely engaging. When it comes to critical leadership searches, Buck & Bricks is a trusted strategic partner I rely on without hesitation.",
+      author: 'Muhammad Zeeshan Asif',
+      role: 'General Manager HR',
+      company: 'Pakistan Beverage Limited',
+      avatar: '',
+    },
+    {
+      id: '2',
+      quote: "Working with Buck & Bricks over the past 12 years has been an exceptional experience. As a business leader, finding the right executive talent is critical, and they have consistently delivered highest-quality candidate data and insights. Their precision and thorough approach make our hiring process seamless, efficient, and genuinely engaging. When it comes to critical leadership searches, Buck & Bricks is a trusted strategic partner I rely on without hesitation.",
+      author: 'Muhammad ali Asif',
+      role: 'General Manager HR',
+      company: 'Pakistan Beverage Limited',
+      avatar: '',
+    },
+    {
+      id: '3',
+      quote: "Working with Buck & Bricks over the past 12 years has been an exceptional experience. As a business leader, finding the right executive talent is critical, and they have consistently delivered highest-quality candidate data and insights. Their precision and thorough approach make our hiring process seamless, efficient, and genuinely engaging. When it comes to critical leadership searches, Buck & Bricks is a trusted strategic partner I rely on without hesitation.",
+      author: 'Muhammad Zeeshan Asif',
+      role: 'General Manager HR',
+      company: 'Pakistan Beverage Limited',
+      avatar: '',
+    },
+    {
+      id: '4',
+      quote: "Working with Buck & Bricks over the past 12 years has been an exceptional experience. As a business leader, finding the right executive talent is critical, and they have consistently delivered highest-quality candidate data and insights. Their precision and thorough approach make our hiring process seamless, efficient, and genuinely engaging. When it comes to critical leadership searches, Buck & Bricks is a trusted strategic partner I rely on without hesitation.",
+      author: 'Muhammad Zeeshan Asif',
+      role: 'General Manager HR',
+      company: 'Pakistan Beverage Limited',
+      avatar: '',
+    },
+  ];
+>>>>>>> 585aa82da00defc218930ff3ef381a8766b0a600
 
   const resetAutoplay = () => {
     if (timerRef.current) clearInterval(timerRef.current);
