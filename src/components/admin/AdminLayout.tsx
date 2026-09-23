@@ -246,38 +246,7 @@ export function AdminLayout({ subRoute = 'default', onNavigateSubRoute, onBackTo
             </button>
 
             {/* Quick Credentials Info & Autofill */}
-            <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs space-y-1.5 mt-2">
-              <div className="flex items-center justify-between text-[11px] text-slate-600 font-semibold">
-                <span>Master Credentials:</span>
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setLoginEmail('admin@bucksnbricks.com');
-                      setLoginPassword('AdminPassword123!');
-                    }}
-                    className="text-[#052842] hover:underline font-bold cursor-pointer text-[11px]"
-                  >
-                    Use Master
-                  </button>
-                  <span>•</span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setLoginEmail('azwarhussain001@gmail.com');
-                      setLoginPassword('AdminPassword123!');
-                    }}
-                    className="text-[#052842] hover:underline font-bold cursor-pointer text-[11px]"
-                  >
-                    Use User Email
-                  </button>
-                </div>
-              </div>
-              <div className="text-[11px] font-mono text-slate-700 bg-white p-2 rounded-lg border border-slate-100 space-y-0.5">
-                <div>Email: <span className="font-semibold text-slate-900">admin@bucksnbricks.com</span></div>
-                <div>Password: <span className="font-semibold text-slate-900">AdminPassword123!</span></div>
-              </div>
-            </div>
+          
           </form>
 
           {adminExists === false && (
