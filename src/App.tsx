@@ -34,23 +34,44 @@ interface RouteState {
 
 function parseCurrentRoute(): RouteState {
   const adminRoute = getAdminPanelRoute(); // e.g. "management-portal"
-  const path = window.location.pathname.replace(/^\/+|\/+$/g, '');
-  const hash = window.location.hash.replace(/^#\/?/, '').replace(/^\/+|\/+$/g, '');
+  const rawHash = window.location.hash
+    .replace(/^#\/?/, '')
+    .replace(/^!/, '')
+    .replace(/^\/+|\/+$/g, '')
+    .split('?')[0];
 
-  const rawRoute = path || hash;
+  const rawPath = window.location.pathname
+    .replace(/^\/+|\/+$/g, '')
+    .split('?')[0];
 
-  // 1. Check if accessing the configured admin panel route
-  if (rawRoute === adminRoute || rawRoute.startsWith(`${adminRoute}/`)) {
-    const sub = rawRoute.replace(adminRoute, '').replace(/^\/+/, '');
-    if (sub === 'setup') return { page: 'admin', adminSubRoute: 'setup', isInvalidAdmin: false };
-    if (sub === 'login') return { page: 'admin', adminSubRoute: 'login', isInvalidAdmin: false };
-    if (sub === 'dashboard' || sub.startsWith('dashboard/')) return { page: 'admin', adminSubRoute: 'dashboard', isInvalidAdmin: false };
+  // In SPA with hash navigation, hash takes priority when present
+  const rawRoute = rawHash || rawPath;
+
+  // 1. Check if accessing admin route (supports 'admin' as well as configured adminRoute / management-portal)
+  const isAdminTarget =
+    rawRoute === 'admin' ||
+    rawRoute.startsWith('admin/') ||
+    rawRoute === adminRoute ||
+    rawRoute.startsWith(`${adminRoute}/`) ||
+    rawRoute === 'management-portal' ||
+    rawRoute.startsWith('management-portal/');
+
+  if (isAdminTarget) {
+    let cleanSub = '';
+    if (rawRoute === 'admin' || rawRoute === adminRoute || rawRoute === 'management-portal') {
+      cleanSub = '';
+    } else if (rawRoute.startsWith('admin/')) {
+      cleanSub = rawRoute.replace(/^admin\/?/, '');
+    } else if (rawRoute.startsWith('management-portal/')) {
+      cleanSub = rawRoute.replace(/^management-portal\/?/, '');
+    } else if (rawRoute.startsWith(`${adminRoute}/`)) {
+      cleanSub = rawRoute.replace(adminRoute, '').replace(/^\/+/, '');
+    }
+
+    if (cleanSub === 'setup') return { page: 'admin', adminSubRoute: 'setup', isInvalidAdmin: false };
+    if (cleanSub === 'login') return { page: 'admin', adminSubRoute: 'login', isInvalidAdmin: false };
+    if (cleanSub === 'dashboard' || cleanSub.startsWith('dashboard/')) return { page: 'admin', adminSubRoute: 'dashboard', isInvalidAdmin: false };
     return { page: 'admin', adminSubRoute: 'default', isInvalidAdmin: false };
-  }
-
-  // 2. If visiting invalid admin route like /admin or #admin when ADMIN_PANEL_ROUTE is different
-  if (adminRoute !== 'admin' && (rawRoute === 'admin' || rawRoute.startsWith('admin/'))) {
-    return { page: 'home', adminSubRoute: 'default', isInvalidAdmin: true };
   }
 
   // 3. Public standalone routes
@@ -91,13 +112,26 @@ export default function App() {
       const state = parseCurrentRoute();
       if (state.isInvalidAdmin) {
         // Redirect invalid admin URL to public home page
-        window.history.replaceState(null, '', '/');
+        window.history.replaceState(null, '', '/#home');
         window.location.hash = '#home';
       }
+      if (state.page !== 'admin' && window.location.pathname !== '/' && window.location.pathname !== '') {
+        const targetHash = state.page === 'home' ? 'home' : (window.location.hash.replace(/^#\/?/, '') || state.page);
+        window.history.replaceState(null, '', `/#${targetHash}`);
+      }
       if (state.page === 'job-detail') {
-        const hash = window.location.hash;
-        if (hash.startsWith('#job-')) {
-          setSelectedJobId(hash.replace('#job-', '') || '1');
+        const hash = window.location.hash.replace(/^#\/?/, '');
+        if (hash.startsWith('job-')) {
+          setSelectedJobId(hash.replace(/^job-/, '') || '1');
+        }
+      }
+      if (state.page === 'home') {
+        const targetHash = window.location.hash.replace(/^#\/?/, '');
+        if (targetHash === 'services' || targetHash === 'contact' || targetHash === 'team' || targetHash === 'why-choose-us') {
+          setTimeout(() => {
+            const el = document.getElementById(targetHash);
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+          }, 150);
         }
       }
       setRouteState(state);
@@ -107,8 +141,19 @@ export default function App() {
     window.addEventListener('hashchange', handleLocationChange);
 
     if (routeState.isInvalidAdmin) {
-      window.history.replaceState(null, '', '/');
+      window.history.replaceState(null, '', '/#home');
       window.location.hash = '#home';
+    } else if (routeState.page !== 'admin' && window.location.pathname !== '/' && window.location.pathname !== '') {
+      const targetHash = routeState.page === 'home' ? 'home' : (window.location.hash.replace(/^#\/?/, '') || routeState.page);
+      window.history.replaceState(null, '', `/#${targetHash}`);
+    }
+
+    const initialHash = window.location.hash.replace(/^#\/?/, '');
+    if (initialHash === 'services' || initialHash === 'contact' || initialHash === 'team' || initialHash === 'why-choose-us') {
+      setTimeout(() => {
+        const el = document.getElementById(initialHash);
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+      }, 200);
     }
 
     return () => {
@@ -119,11 +164,12 @@ export default function App() {
 
   const handlePageChange = (page: string) => {
     if (page === 'home') {
-      window.history.pushState(null, '', '/');
+      window.history.pushState(null, '', '/#home');
       window.location.hash = '#home';
       setRouteState({ page: 'home', adminSubRoute: 'default', isInvalidAdmin: false });
       window.scrollTo(0, 0);
     } else {
+      window.history.pushState(null, '', `/#${page}`);
       window.location.hash = `#${page}`;
       setRouteState({ page, adminSubRoute: 'default', isInvalidAdmin: false });
       window.scrollTo(0, 0);

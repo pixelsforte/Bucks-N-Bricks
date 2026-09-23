@@ -5,49 +5,80 @@ import { motion, AnimatePresence } from 'motion/react';
 import { ChevronUp, ChevronDown, Quote } from 'lucide-react';
 import { AnimatedHeading, AnimatedParagraph, AnimatedButton } from './animations';
 import { Testimonial } from '../types';
+import { getTeamMembers } from '../services/api';
+
+const defaultTestimonials: Testimonial[] = [
+  {
+    id: '1',
+    quote: "Working with Buck & Bricks over the past 12 years has been an exceptional experience. As a business leader, finding the right executive talent is critical, and they have consistently delivered highest-quality candidate data and insights. Their precision and thorough approach make our hiring process seamless, efficient, and genuinely engaging. When it comes to critical leadership searches, Buck & Bricks is a trusted strategic partner I rely on without hesitation.",
+    author: 'Muhammad Zeeshan Asif',
+    role: 'General Manager HR',
+    company: 'Pakistan Beverage Limited',
+    avatar: '',
+  },
+  {
+    id: '2',
+    quote: "Working with Buck & Bricks over the past 12 years has been an exceptional experience. As a business leader, finding the right executive talent is critical, and they have consistently delivered highest-quality candidate data and insights. Their precision and thorough approach make our hiring process seamless, efficient, and genuinely engaging. When it comes to critical leadership searches, Buck & Bricks is a trusted strategic partner I rely on without hesitation.",
+    author: 'Muhammad ali Asif',
+    role: 'General Manager HR',
+    company: 'Pakistan Beverage Limited',
+    avatar: '',
+  },
+  {
+    id: '3',
+    quote: "Working with Buck & Bricks over the past 12 years has been an exceptional experience. As a business leader, finding the right executive talent is critical, and they have consistently delivered highest-quality candidate data and insights. Their precision and thorough approach make our hiring process seamless, efficient, and genuinely engaging. When it comes to critical leadership searches, Buck & Bricks is a trusted strategic partner I rely on without hesitation.",
+    author: 'Muhammad Zeeshan Asif',
+    role: 'General Manager HR',
+    company: 'Pakistan Beverage Limited',
+    avatar: '',
+  },
+  {
+    id: '4',
+    quote: "Working with Buck & Bricks over the past 12 years has been an exceptional experience. As a business leader, finding the right executive talent is critical, and they have consistently delivered highest-quality candidate data and insights. Their precision and thorough approach make our hiring process seamless, efficient, and genuinely engaging. When it comes to critical leadership searches, Buck & Bricks is a trusted strategic partner I rely on without hesitation.",
+    author: 'Muhammad Zeeshan Asif',
+    role: 'General Manager HR',
+    company: 'Pakistan Beverage Limited',
+    avatar: '',
+  },
+];
 
 export function Testimonials() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [direction, setDirection] = useState<'forward' | 'backward'>('forward');
+  const [testimonials, setTestimonials] = useState<Testimonial[]>(defaultTestimonials);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const testimonials: Testimonial[] = [
-    {
-      id: '1',
-      quote: "Working with Buck & Bricks over the past 12 years has been an exceptional experience. As a business leader, finding the right executive talent is critical, and they have consistently delivered highest-quality candidate data and insights. Their precision and thorough approach make our hiring process seamless, efficient, and genuinely engaging. When it comes to critical leadership searches, Buck & Bricks is a trusted strategic partner I rely on without hesitation.",
-      author: 'Muhammad Zeeshan Asif',
-      role: 'General Manager HR',
-      company: 'Pakistan Beverage Limited',
-      avatar: '',
-    },
-    {
-      id: '2',
-      quote: "Working with Buck & Bricks over the past 12 years has been an exceptional experience. As a business leader, finding the right executive talent is critical, and they have consistently delivered highest-quality candidate data and insights. Their precision and thorough approach make our hiring process seamless, efficient, and genuinely engaging. When it comes to critical leadership searches, Buck & Bricks is a trusted strategic partner I rely on without hesitation.",
-      author: 'Muhammad Zeeshan Asif',
-      role: 'General Manager HR',
-      company: 'Pakistan Beverage Limited',
-      avatar: '',
-    },
-    {
-      id: '3',
-      quote: "Working with Buck & Bricks over the past 12 years has been an exceptional experience. As a business leader, finding the right executive talent is critical, and they have consistently delivered highest-quality candidate data and insights. Their precision and thorough approach make our hiring process seamless, efficient, and genuinely engaging. When it comes to critical leadership searches, Buck & Bricks is a trusted strategic partner I rely on without hesitation.",
-      author: 'Muhammad Zeeshan Asif',
-      role: 'General Manager HR',
-      company: 'Pakistan Beverage Limited',
-      avatar: '',
-    },
-    {
-      id: '4',
-      quote: "Working with Buck & Bricks over the past 12 years has been an exceptional experience. As a business leader, finding the right executive talent is critical, and they have consistently delivered highest-quality candidate data and insights. Their precision and thorough approach make our hiring process seamless, efficient, and genuinely engaging. When it comes to critical leadership searches, Buck & Bricks is a trusted strategic partner I rely on without hesitation.",
-      author: 'Muhammad Zeeshan Asif',
-      role: 'General Manager HR',
-      company: 'Pakistan Beverage Limited',
-      avatar: '',
-    },
-  ];
+  useEffect(() => {
+    let isMounted = true;
+    getTeamMembers({ activeOnly: true })
+      .then((members) => {
+        if (!isMounted) return;
+        if (Array.isArray(members) && members.length > 0) {
+          const mapped: Testimonial[] = members.map((m) => ({
+            id: m.id || m._id || String(Math.random()),
+            quote: m.bio || m.quote || m.description || '',
+            author: m.name || m.author || '',
+            role: m.role || m.designation || '',
+            company: m.company || '',
+            avatar: m.image || m.avatar || m.picture || '',
+          }));
+          setTestimonials([...defaultTestimonials, ...mapped]);
+        } else {
+          setTestimonials(defaultTestimonials);
+        }
+      })
+      .catch((err) => {
+        console.error('Failed to load team members for testimonials:', err);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const resetAutoplay = () => {
     if (timerRef.current) clearInterval(timerRef.current);
+    if (testimonials.length <= 1) return;
     timerRef.current = setInterval(() => {
       setDirection('forward');
       setActiveIndex((prev) => (prev + 1) % testimonials.length);
@@ -59,19 +90,23 @@ export function Testimonials() {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, []);
+  }, [testimonials.length]);
 
   const handleNext = () => {
+    if (testimonials.length <= 1) return;
     setDirection('forward');
     setActiveIndex((prev) => (prev + 1) % testimonials.length);
     resetAutoplay();
   };
 
   const handlePrev = () => {
+    if (testimonials.length <= 1) return;
     setDirection('backward');
     setActiveIndex((prev) => (prev - 1 + testimonials.length) % testimonials.length);
     resetAutoplay();
   };
+
+  const currentItem = testimonials[activeIndex] || testimonials[0] || defaultTestimonials[0];
 
   // Custom slide animations with professional cubic-bezier easing and scale transitions
   const slideVariants = {
@@ -148,10 +183,10 @@ export function Testimonials() {
                 className="bg-slate-50 border border-slate-100 rounded-3xl p-6 sm:p-8 flex gap-5 items-start text-left w-full shadow-sm"
               >
                 {/* Profile Pic / Blank Placeholder */}
-                {testimonials[activeIndex].avatar ? (
+                {currentItem.avatar ? (
                   <img
-                    src={testimonials[activeIndex].avatar}
-                    alt={testimonials[activeIndex].author}
+                    src={currentItem.avatar}
+                    alt={currentItem.author}
                     className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover border-2 border-white shadow-md shrink-0"
                   />
                 ) : (
@@ -166,14 +201,14 @@ export function Testimonials() {
                   <div className="flex justify-between items-start mb-2 gap-2">
                     <div>
                       <h4 className="text-[#011c30] font-bold font-display text-sm sm:text-base leading-snug">
-                        {testimonials[activeIndex].author}
+                        {currentItem.author}
                       </h4>
                       <p className="text-slate-500 font-medium text-xs tracking-tight mt-0.5">
-                        {testimonials[activeIndex].role}
+                        {currentItem.role}
                       </p>
-                      {testimonials[activeIndex].company && (
+                      {currentItem.company && (
                         <p className="text-slate-400 font-medium text-[11px] tracking-tight mt-0.5">
-                          {testimonials[activeIndex].company}
+                          {currentItem.company}
                         </p>
                       )}
                     </div>
@@ -181,7 +216,7 @@ export function Testimonials() {
                   </div>
                   
                   <p className="text-slate-600 font-sans text-xs sm:text-sm leading-relaxed italic pr-4">
-                    {testimonials[activeIndex].quote}
+                    {currentItem.quote}
                   </p>
                 </div>
               </motion.div>

@@ -9,6 +9,7 @@ import applicationRoutes from './applicationRoutes.js';
 import resumeCheckerRoutes from './resumeCheckerRoutes.js';
 import contactRoutes from './contactRoutes.js';
 import chatbotRoutes from '../modules/chatbot/chatbot.routes.js';
+import teamMemberRoutes from './teamMemberRoutes.js';
 import { scoreMyResume } from '../controllers/resumeCheckerController.js';
 import { upload } from '../middleware/uploadMiddleware.js';
 
@@ -30,6 +31,8 @@ router.use('/applications', applicationRoutes);
 router.use('/resume-checker', resumeCheckerRoutes);
 router.use('/contact', contactRoutes);
 router.use('/admin/contact', contactRoutes);
+router.use('/team-members', teamMemberRoutes);
+router.use('/admin/team-members', teamMemberRoutes);
 router.use('/chatbot', chatbotRoutes);
 router.post('/score-my-resume', upload.single('resume'), scoreMyResume);
 

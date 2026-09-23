@@ -21,7 +21,7 @@ export const analyzeContentWithGemini = async (prompt, systemInstruction = '') =
   const ai = getGenAI();
 
   const response = await ai.models.generateContent({
-    model: 'gemini-3.6-flash',
+    model: 'gemini-2.5-flash',
     contents: prompt,
     config: {
       systemInstruction,
@@ -77,7 +77,7 @@ JSON output format:
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-3.6-flash',
+      model: 'gemini-2.5-flash',
       contents: prompt,
       config: {
         systemInstruction,

@@ -226,6 +226,106 @@ export const initOfflineData = () => {
       }
     ];
   }
+
+  if (!global.offlineTeamMembers || global.offlineTeamMembers.length === 0) {
+    global.offlineTeamMembers = [
+      {
+        _id: 'offline-team-1',
+        id: 'offline-team-1',
+        name: 'Mohsin',
+        role: 'Director Operations',
+        qualification: 'MBA in Marketing',
+        image: '/assets/team-mohsin.jpeg',
+        bgColor: 'bg-gradient-to-b from-blue-500/90 to-blue-700/95',
+        bio: 'Overseeing operations and client partnerships with a focus on delivering high-impact recruitment and executive search solutions. We bridge the gap between organizational ambitions and exceptional leadership talent across diverse industries.',
+        company: 'Bucks n Bricks',
+        order: 1,
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        author: 'Mohsin',
+        designation: 'Director Operations',
+        quote: 'Overseeing operations and client partnerships with a focus on delivering high-impact recruitment and executive search solutions. We bridge the gap between organizational ambitions and exceptional leadership talent across diverse industries.',
+        avatar: '/assets/team-mohsin.jpeg',
+      },
+      {
+        _id: 'offline-team-2',
+        id: 'offline-team-2',
+        name: 'Shoaib Ahmed Zafar',
+        role: 'Sr Manager Technical Recruitment and Accounts',
+        qualification: 'BSc Computer Science',
+        image: '/assets/team-shoaib.jpeg',
+        bgColor: 'bg-gradient-to-b from-indigo-500/90 to-indigo-700/95',
+        bio: 'Leading specialized technical talent acquisition and strategic account management. We help businesses build robust engineering and technology teams that accelerate innovation and organizational growth.',
+        company: 'Bucks n Bricks',
+        order: 2,
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        author: 'Shoaib Ahmed Zafar',
+        designation: 'Sr Manager Technical Recruitment and Accounts',
+        quote: 'Leading specialized technical talent acquisition and strategic account management. We help businesses build robust engineering and technology teams that accelerate innovation and organizational growth.',
+        avatar: '/assets/team-shoaib.jpeg',
+      },
+      {
+        _id: 'offline-team-3',
+        id: 'offline-team-3',
+        name: 'Saima Yasir',
+        role: 'Manager Business Operations',
+        qualification: 'Masters in Human Resource Management',
+        image: '/assets/Team-1-1.jpeg',
+        bgColor: 'bg-gradient-to-b from-cyan-500/90 to-cyan-700/95',
+        bio: 'Optimizing business operations and streamlining recruitment workflows to drive organizational growth. Committed to delivering seamless management and high-quality outcomes for our clients and team.',
+        company: 'Bucks n Bricks',
+        order: 3,
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        author: 'Saima Yasir',
+        designation: 'Manager Business Operations',
+        quote: 'Optimizing business operations and streamlining recruitment workflows to drive organizational growth. Committed to delivering seamless management and high-quality outcomes for our clients and team.',
+        avatar: '/assets/Team-1-1.jpeg',
+      },
+      {
+        _id: 'offline-team-4',
+        id: 'offline-team-4',
+        name: 'Amna Jamal',
+        role: 'HR Officer',
+        qualification: 'BBA in Human Resources',
+        image: '/assets/Team-2-1.jpeg',
+        bgColor: 'bg-gradient-to-b from-rose-400/90 to-rose-600/95',
+        bio: 'Passionate about connecting exceptional talent with the right opportunities. Being part of Bucks n Bricks has strengthened my expertise in recruitment, talent management, and delivering meaningful solutions for both clients and candidates.',
+        company: 'Bucks n Bricks',
+        order: 4,
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        author: 'Amna Jamal',
+        designation: 'HR Officer',
+        quote: 'Passionate about connecting exceptional talent with the right opportunities. Being part of Bucks n Bricks has strengthened my expertise in recruitment, talent management, and delivering meaningful solutions for both clients and candidates.',
+        avatar: '/assets/Team-2-1.jpeg',
+      },
+      {
+        _id: 'offline-team-5',
+        id: 'offline-team-5',
+        name: 'Aiman Farooqui',
+        role: 'HR Officer',
+        qualification: 'BS in Psychology',
+        image: '/assets/Team-3-1.jpeg',
+        bgColor: 'bg-gradient-to-b from-teal-400/90 to-teal-600/95',
+        bio: 'Collaborating with diverse clients across multiple industries has strengthened my ability to understand unique hiring requirements and deliver quality talent within dynamic business environments.',
+        company: 'Bucks n Bricks',
+        order: 5,
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        author: 'Aiman Farooqui',
+        designation: 'HR Officer',
+        quote: 'Collaborating with diverse clients across multiple industries has strengthened my ability to understand unique hiring requirements and deliver quality talent within dynamic business environments.',
+        avatar: '/assets/Team-3-1.jpeg',
+      }
+    ];
+  }
 };
 
 export const getOfflineJobsResult = (queryParams, isPublic = false) => {
@@ -689,6 +789,109 @@ export const deleteOfflineContact = (id) => {
     return true;
   }
   return false;
+};
+
+// -------------------------------------------------------------
+// Team Members Offline Storage & Operations
+// -------------------------------------------------------------
+export const getOfflineTeamMembers = (queryParams = {}) => {
+  initOfflineData();
+  if (!global.offlineTeamMembers) global.offlineTeamMembers = [];
+  let members = [...global.offlineTeamMembers];
+  
+  if (queryParams.search) {
+    const q = queryParams.search.toLowerCase().trim();
+    members = members.filter(
+      (m) =>
+        (m.name && m.name.toLowerCase().includes(q)) ||
+        (m.role && m.role.toLowerCase().includes(q)) ||
+        (m.bio && m.bio.toLowerCase().includes(q)) ||
+        (m.company && m.company.toLowerCase().includes(q))
+    );
+  }
+
+  // Sort by order ascending, then by createdAt descending
+  members.sort((a, b) => {
+    const orderDiff = (a.order || 0) - (b.order || 0);
+    if (orderDiff !== 0) return orderDiff;
+    return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+  });
+
+  return members;
+};
+
+export const getOfflineTeamMemberById = (id) => {
+  initOfflineData();
+  if (!global.offlineTeamMembers) global.offlineTeamMembers = [];
+  return global.offlineTeamMembers.find((m) => String(m._id || m.id) === String(id)) || null;
+};
+
+export const createOfflineTeamMember = (data) => {
+  initOfflineData();
+  if (!global.offlineTeamMembers) global.offlineTeamMembers = [];
+  const id = 'offline-team-' + Date.now();
+  const newMember = {
+    _id: id,
+    id,
+    name: data.name || data.fullName || 'Team Member',
+    role: data.role || data.designation || 'Specialist',
+    bio: data.bio || data.description || data.quote || '',
+    image: data.image || data.picture || data.avatar || '',
+    company: data.company || 'Bucks n Bricks',
+    order: Number(data.order) || 0,
+    isActive: data.isActive !== undefined ? Boolean(data.isActive) : true,
+    createdBy: data.createdBy || null,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    // Presentation compatibility
+    author: data.name || data.fullName || 'Team Member',
+    designation: data.role || data.designation || 'Specialist',
+    quote: data.bio || data.description || data.quote || '',
+    avatar: data.image || data.picture || data.avatar || '',
+  };
+  global.offlineTeamMembers.push(newMember);
+  return newMember;
+};
+
+export const updateOfflineTeamMember = (id, updates) => {
+  initOfflineData();
+  if (!global.offlineTeamMembers) global.offlineTeamMembers = [];
+  const index = global.offlineTeamMembers.findIndex((m) => String(m._id || m.id) === String(id));
+  if (index === -1) return null;
+
+  const existing = global.offlineTeamMembers[index];
+  const updated = {
+    ...existing,
+    ...updates,
+    updatedAt: new Date(),
+  };
+
+  if (updates.name) {
+    updated.author = updates.name;
+  }
+  if (updates.role) {
+    updated.designation = updates.role;
+  }
+  if (updates.bio) {
+    updated.quote = updates.bio;
+  }
+  if (updates.image !== undefined) {
+    updated.avatar = updates.image;
+  }
+
+  global.offlineTeamMembers[index] = updated;
+  return updated;
+};
+
+export const deleteOfflineTeamMember = (id) => {
+  initOfflineData();
+  if (!global.offlineTeamMembers) global.offlineTeamMembers = [];
+  const index = global.offlineTeamMembers.findIndex((m) => String(m._id || m.id) === String(id));
+  if (index !== -1) {
+    const deleted = global.offlineTeamMembers.splice(index, 1);
+    return deleted[0];
+  }
+  return null;
 };
 
 

@@ -5,10 +5,11 @@ import { AdminUser } from '../../types';
 
 interface SuperAdminSetupProps {
   onSetupSuccess: (admin: AdminUser) => void;
+  onGoToLogin?: () => void;
   onBackToPublic?: () => void;
 }
 
-export function SuperAdminSetup({ onSetupSuccess, onBackToPublic }: SuperAdminSetupProps) {
+export function SuperAdminSetup({ onSetupSuccess, onGoToLogin, onBackToPublic }: SuperAdminSetupProps) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -154,8 +155,18 @@ export function SuperAdminSetup({ onSetupSuccess, onBackToPublic }: SuperAdminSe
           </button>
         </form>
 
-        {onBackToPublic && (
-          <div className="text-center pt-2 border-t border-slate-100">
+        <div className="pt-2 border-t border-slate-100 flex flex-col items-center gap-2.5">
+          {onGoToLogin && (
+            <button
+              type="button"
+              onClick={onGoToLogin}
+              className="text-xs font-bold text-[#052842] hover:underline cursor-pointer"
+            >
+              Already initialized or created an Admin? Go to Admin Login →
+            </button>
+          )}
+
+          {onBackToPublic && (
             <button
               type="button"
               onClick={onBackToPublic}
@@ -164,8 +175,8 @@ export function SuperAdminSetup({ onSetupSuccess, onBackToPublic }: SuperAdminSe
               <ArrowLeft size={14} />
               <span>Back to Public Website</span>
             </button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

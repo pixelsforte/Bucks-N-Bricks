@@ -6,3 +6,4 @@ export * as jobController from './jobController.js';
 export * as dashboardController from './dashboardController.js';
 export * as applicationController from './applicationController.js';
 export * as resumeCheckerController from './resumeCheckerController.js';
+export * as teamMemberController from './teamMemberController.js';

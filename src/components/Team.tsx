@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { User, X, CheckCircle } from "lucide-react";
 import {
@@ -6,6 +6,7 @@ import {
   AnimatedParagraph,
 } from "./animations";
 import { TeamMember } from "../types";
+import { getTeamMembers } from "../services/api";
 
 const teamMohsin = '/assets/team-mohsin.jpeg';
 const teamShoaib = '/assets/team-shoaib.jpeg';
@@ -20,53 +21,121 @@ interface ExtendedTeamMember extends TeamMember {
   placeholderInitials?: string;
 }
 
+const defaultGradients = [
+  "bg-gradient-to-b from-blue-500/90 to-blue-700/95",
+  "bg-gradient-to-b from-indigo-500/90 to-indigo-700/95",
+  "bg-gradient-to-b from-cyan-500/90 to-cyan-700/95",
+  "bg-gradient-to-b from-rose-400/90 to-rose-600/95",
+  "bg-gradient-to-b from-teal-400/90 to-teal-600/95",
+  "bg-gradient-to-b from-violet-500/90 to-violet-700/95",
+  "bg-gradient-to-b from-amber-500/90 to-amber-700/95",
+  "bg-gradient-to-b from-emerald-500/90 to-emerald-700/95",
+];
+
+const defaultTeam: ExtendedTeamMember[] = [
+  {
+    id: "1",
+    name: "Mohsin",
+    role: "Director Operations",
+    qualification: "MBA in Marketing",
+    image: teamMohsin,
+    bgColor: "bg-gradient-to-b from-blue-500/90 to-blue-700/95",
+    quote: "Overseeing operations and client partnerships with a focus on delivering high-impact recruitment and executive search solutions. We bridge the gap between organizational ambitions and exceptional leadership talent across diverse industries.",
+  },
+  {
+    id: "2",
+    name: "Shoaib Ahmed Zafar",
+    role: "Sr Manager Technical Recruitment and Accounts",
+    qualification: "BSc Computer Science",
+    image: teamShoaib,
+    bgColor: "bg-gradient-to-b from-indigo-500/90 to-indigo-700/95",
+    quote: "Leading specialized technical talent acquisition and strategic account management. We help businesses build robust engineering and technology teams that accelerate innovation and organizational growth.",
+  },
+  {
+    id: "3",
+    name: "Saima Yasir",
+    role: "Manager Business Operations",
+    qualification: "Masters in Human Resource Management",
+    image: teamSaima,
+    bgColor: "bg-gradient-to-b from-cyan-500/90 to-cyan-700/95",
+    quote: "Optimizing business operations and streamlining recruitment workflows to drive organizational growth. Committed to delivering seamless management and high-quality outcomes for our clients and team.",
+  },
+  {
+    id: "4",
+    name: "Amna Jamal",
+    role: "HR Officer",
+    qualification: "BBA in Human Resources",
+    image: team2,
+    bgColor: "bg-gradient-to-b from-rose-400/90 to-rose-600/95",
+    quote: "Passionate about connecting exceptional talent with the right opportunities. Being part of Bucks n Bricks has strengthened my expertise in recruitment, talent management, and delivering meaningful solutions for both clients and candidates.",
+  },
+  {
+    id: "5",
+    name: "Aiman Farooqui",
+    role: "HR Officer",
+    qualification: "BS in Psychology",
+    image: team3,
+    bgColor: "bg-gradient-to-b from-teal-400/90 to-teal-600/95",
+    quote: "Collaborating with diverse clients across multiple industries has strengthened my ability to understand unique hiring requirements and deliver quality talent within dynamic business environments.",
+  },
+];
+
 export function Team() {
+  const [team, setTeam] = useState<ExtendedTeamMember[]>(defaultTeam);
   const [activeId, setActiveId] = useState<string>("1");
   const [selectedMember, setSelectedMember] = useState<ExtendedTeamMember | null>(null);
 
-  const team: ExtendedTeamMember[] = [
-    {
-      id: "1",
-      name: "Mohsin",
-      role: "Director Operations",
-      qualification: "MBA in Marketing",
-      image: teamMohsin,
-      bgColor: "bg-gradient-to-b from-blue-500/90 to-blue-700/95",
-      quote: "Overseeing operations and client partnerships with a focus on delivering high-impact recruitment and executive search solutions. We bridge the gap between organizational ambitions and exceptional leadership talent across diverse industries.",
-    },
-    {
-      id: "2",
-      name: "Shoaib Ahmed Zafar",
-      role: "Sr Manager Technical Recruitment and Accounts",
-      image: teamShoaib,
-      bgColor: "bg-gradient-to-b from-indigo-500/90 to-indigo-700/95",
-      quote: "Leading specialized technical talent acquisition and strategic account management. We help businesses build robust engineering and technology teams that accelerate innovation and organizational growth.",
-    },
-    {
-      id: "3",
-      name: "Saima Yasir",
-      role: "Manager Business Operations",
-      image: teamSaima,
-      bgColor: "bg-gradient-to-b from-cyan-500/90 to-cyan-700/95",
-      quote: "Optimizing business operations and streamlining recruitment workflows to drive organizational growth. Committed to delivering seamless management and high-quality outcomes for our clients and team.",
-    },
-    {
-      id: "4",
-      name: "Amna Jamal",
-      role: "HR Officer",
-      image: team2,
-      bgColor: "bg-gradient-to-b from-rose-400/90 to-rose-600/95",
-      quote: "Passionate about connecting exceptional talent with the right opportunities. Being part of Bucks n Bricks has strengthened my expertise in recruitment, talent management, and delivering meaningful solutions for both clients and candidates.",
-    },
-    {
-      id: "5",
-      name: "Aiman Farooqui",
-      role: "HR Officer",
-      image: team3,
-      bgColor: "bg-gradient-to-b from-teal-400/90 to-teal-600/95",
-      quote: "Collaborating with diverse clients across multiple industries has strengthened my ability to understand unique hiring requirements and deliver quality talent within dynamic business environments.",
-    },
-  ];
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadMembers() {
+      try {
+        const data = await getTeamMembers({ activeOnly: true });
+        if (isMounted && data && Array.isArray(data) && data.length > 0) {
+          const mapped: ExtendedTeamMember[] = data.map((m, index) => {
+            const memberName = m.name || m.author || 'Team Member';
+            const memberRole = m.role || m.designation || 'Specialist';
+            const memberQuote = m.bio || m.quote || m.description || 'Dedicated specialist at Bucks n Bricks.';
+            const memberImage = m.image || m.avatar || m.picture || '';
+            const memberBg = m.bgColor || defaultGradients[index % defaultGradients.length];
+
+            // Extract uppercase initials
+            const nameParts = memberName.trim().split(/\s+/);
+            const initials = nameParts.length >= 2
+              ? `${nameParts[0][0]}${nameParts[nameParts.length - 1][0]}`.toUpperCase()
+              : memberName.slice(0, 2).toUpperCase();
+
+            return {
+              id: m.id || m._id || String(index + 1),
+              name: memberName,
+              role: memberRole,
+              qualification: m.qualification || '',
+              company: m.company || 'Bucks n Bricks',
+              image: memberImage,
+              bgColor: memberBg,
+              quote: memberQuote,
+              placeholderInitials: initials,
+              order: m.order,
+              isActive: m.isActive,
+            };
+          });
+
+          setTeam(mapped);
+          if (mapped.length > 0) {
+            setActiveId(mapped[0].id);
+          }
+        }
+      } catch {
+        // Keep defaultTeam intact if backend is unreachable
+      }
+    }
+
+    loadMembers();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   return (
     <section
@@ -101,8 +170,9 @@ export function Team() {
         </div>
 
         <div className="flex flex-col md:flex-row gap-3 md:gap-3 max-w-6xl mx-auto min-h-[440px] md:h-[440px]">
-          {team.map((member) => {
-            const isActive = activeId === member.id;
+          {team.map((member, index) => {
+            const effectiveActiveId = team.some((m) => m.id === activeId) ? activeId : (team[0]?.id || "");
+            const isActive = effectiveActiveId === member.id;
 
             const flexClass = isActive
               ? "md:flex-[2.5] flex-[2.0]"

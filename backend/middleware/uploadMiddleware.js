@@ -47,3 +47,38 @@ export const upload = multer({
   },
   fileFilter,
 });
+
+// Image File Filter Validation (for Team Member pictures, etc.)
+const imageExtensions = ['.jpg', '.jpeg', '.png', '.webp', '.gif', '.avif'];
+const imageMimeTypes = [
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/gif',
+  'image/avif',
+];
+
+const imageFileFilter = (req, file, cb) => {
+  const ext = path.extname(file.originalname).toLowerCase();
+  const isAllowedExt = imageExtensions.includes(ext);
+  const isAllowedMime = imageMimeTypes.includes(file.mimetype) || file.mimetype.startsWith('image/');
+
+  if (isAllowedExt || isAllowedMime) {
+    cb(null, true);
+  } else {
+    cb(
+      ApiError.badRequest(
+        `Invalid image format. Allowed image formats: ${imageExtensions.join(', ')}`
+      ),
+      false
+    );
+  }
+};
+
+export const uploadImage = multer({
+  storage,
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10MB
+  },
+  fileFilter: imageFileFilter,
+});

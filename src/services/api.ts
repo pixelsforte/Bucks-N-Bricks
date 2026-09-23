@@ -1,4 +1,4 @@
-import { JobVacancy, JobPagination, AdminUser, ApplicationItem, ApplicationDetail, ResumeCheckerRecord, SystemSettings, ContactMessage } from '../types';
+import { JobVacancy, JobPagination, AdminUser, ApplicationItem, ApplicationDetail, ResumeCheckerRecord, SystemSettings, ContactMessage, TeamMember } from '../types';
 
 const API_BASE_URL = '/api/v1';
 
@@ -519,5 +519,85 @@ export async function sendChatbotMessage(message: string, history: { role: strin
   );
   return res.data;
 }
+
+// ==================== TEAM MEMBERS APIs ====================
+
+export async function getTeamMembers(params: { search?: string; activeOnly?: boolean } = {}): Promise<TeamMember[]> {
+  const query = new URLSearchParams();
+  if (params.search) query.append('search', params.search);
+  if (params.activeOnly !== undefined) query.append('activeOnly', String(params.activeOnly));
+
+  const queryString = query.toString() ? `?${query.toString()}` : '';
+  const res = await request<{ data: TeamMember[] }>(`/team-members${queryString}`, { method: 'GET' }, false);
+  return res.data;
+}
+
+export async function getTeamMemberById(id: string): Promise<TeamMember> {
+  const res = await request<{ data: TeamMember }>(`/team-members/${id}`, { method: 'GET' }, false);
+  return res.data;
+}
+
+export async function createTeamMember(data: FormData | Partial<TeamMember>): Promise<TeamMember> {
+  const token = getAuthToken();
+  const headers: Record<string, string> = {};
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  let body: BodyInit;
+  if (data instanceof FormData) {
+    body = data;
+  } else {
+    headers['Content-Type'] = 'application/json';
+    body = JSON.stringify(data);
+  }
+
+  const response = await fetch(`${API_BASE_URL}/team-members`, {
+    method: 'POST',
+    headers,
+    body,
+  });
+
+  const resData = await response.json().catch(() => ({}));
+  if (!response.ok || !resData.success) {
+    throw new Error(resData.message || 'Failed to create team member.');
+  }
+
+  return resData.data;
+}
+
+export async function updateTeamMember(id: string, data: FormData | Partial<TeamMember>): Promise<TeamMember> {
+  const token = getAuthToken();
+  const headers: Record<string, string> = {};
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  let body: BodyInit;
+  if (data instanceof FormData) {
+    body = data;
+  } else {
+    headers['Content-Type'] = 'application/json';
+    body = JSON.stringify(data);
+  }
+
+  const response = await fetch(`${API_BASE_URL}/team-members/${id}`, {
+    method: 'PATCH',
+    headers,
+    body,
+  });
+
+  const resData = await response.json().catch(() => ({}));
+  if (!response.ok || !resData.success) {
+    throw new Error(resData.message || 'Failed to update team member.');
+  }
+
+  return resData.data;
+}
+
+export async function deleteTeamMember(id: string): Promise<void> {
+  await request(`/team-members/${id}`, { method: 'DELETE' }, true);
+}
+
 
 

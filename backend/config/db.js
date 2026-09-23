@@ -1,6 +1,9 @@
 import mongoose from 'mongoose';
 import { logger } from '../utils/logger.js';
 
+// CRITICAL: Fail fast if MongoDB is offline - do not hang on queries
+mongoose.set('bufferCommands', false);
+
 /**
  * Connect to MongoDB Atlas via Mongoose
  */

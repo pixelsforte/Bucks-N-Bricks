@@ -19,6 +19,29 @@ export const errorMiddleware = (err, req, res, next) => {
     error = new ApiError(HTTP_STATUS.BAD_REQUEST, message);
   }
 
+  // Handle Mongoose Network / Buffering / ServerSelection Errors when MongoDB is offline
+  if (
+    err.name === 'MongooseError' ||
+    err.name === 'MongoNetworkError' ||
+    err.name === 'MongoServerSelectionError' ||
+    (err.message && (err.message.includes('buffering timed out') || err.message.includes('ECONNREFUSED')))
+  ) {
+    logger.warn(`[AI Studio] Database offline notice: ${err.message}`);
+    if (req.method === 'GET') {
+      return res.status(200).json({
+        success: true,
+        statusCode: 200,
+        message: 'Serving offline fallback',
+        data: req.path.endsWith('s') || req.path.endsWith('s/') ? [] : {},
+      });
+    }
+    return res.status(503).json({
+      success: false,
+      statusCode: 503,
+      message: 'Service temporarily unavailable (database offline)',
+    });
+  }
+
   // Handle Mongoose Duplicate Key Error (Code 11000)
   if (err.code === 11000) {
     const field = Object.keys(err.keyValue || {})[0] || 'Field';

@@ -11,11 +11,14 @@ import {
   ShieldAlert,
   Loader2,
   MessageSquare,
+  UserCheck,
+  CheckCircle,
 } from 'lucide-react';
 import { VacancyManagement } from './VacancyManagement';
 import { ApplicationsManagement } from './ApplicationsManagement';
 import { ResumeCheckerManagement } from './ResumeCheckerManagement';
 import { ContactMessagesManagement } from './ContactMessagesManagement';
+import { TeamMembersManagement } from './TeamMembersManagement';
 import { SettingsManagement } from './SettingsManagement';
 import { DashboardOverview } from './DashboardOverview';
 import { ForgotPasswordModal } from './ForgotPasswordModal';
@@ -37,7 +40,7 @@ interface AdminLayoutProps {
 }
 
 export function AdminLayout({ subRoute = 'default', onNavigateSubRoute, onBackToPublic }: AdminLayoutProps) {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'vacancies' | 'applications' | 'resume-checker' | 'contacts' | 'settings'>('vacancies');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'vacancies' | 'applications' | 'resume-checker' | 'contacts' | 'team-members' | 'settings'>('vacancies');
   const [currentAdmin, setCurrentAdmin] = useState<AdminUser | null>(null);
   const [adminExists, setAdminExists] = useState<boolean | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -46,6 +49,8 @@ export function AdminLayout({ subRoute = 'default', onNavigateSubRoute, onBackTo
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [loginError, setLoginError] = useState<string | null>(null);
+  const [loginSuccessNotice, setLoginSuccessNotice] = useState<string | null>(null);
+  const [forceShowLogin, setForceShowLogin] = useState<boolean>(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
 
@@ -57,10 +62,9 @@ export function AdminLayout({ subRoute = 'default', onNavigateSubRoute, onBackTo
       setAdminExists(status.adminExists);
 
       if (!status.adminExists) {
-        // No admin in DB -> Public Setup MUST be shown
         removeAuthToken();
         setCurrentAdmin(null);
-        if (onNavigateSubRoute && subRoute !== 'setup') {
+        if (onNavigateSubRoute && subRoute !== 'setup' && !forceShowLogin) {
           onNavigateSubRoute('setup');
         }
       } else {
@@ -137,10 +141,14 @@ export function AdminLayout({ subRoute = 'default', onNavigateSubRoute, onBackTo
   };
 
   const handleSetupSuccess = (admin: AdminUser) => {
-    setCurrentAdmin(admin);
+    removeAuthToken();
+    setCurrentAdmin(null);
     setAdminExists(true);
+    setForceShowLogin(true);
+    setLoginEmail(admin.email || '');
+    setLoginSuccessNotice('Super Admin initialized successfully in database! Please sign in with your credentials.');
     if (onNavigateSubRoute) {
-      onNavigateSubRoute('dashboard');
+      onNavigateSubRoute('login');
     }
   };
 
@@ -153,12 +161,18 @@ export function AdminLayout({ subRoute = 'default', onNavigateSubRoute, onBackTo
     );
   }
 
-  // 1. If NO admin exists in database, show First-Time Super Admin Signup
-  if (adminExists === false) {
-    return <SuperAdminSetup onSetupSuccess={handleSetupSuccess} onBackToPublic={onBackToPublic} />;
+  // 1. If NO admin exists in database and user hasn't explicitly navigated to login, show First-Time Super Admin Signup
+  if (adminExists === false && !forceShowLogin && subRoute !== 'login') {
+    return (
+      <SuperAdminSetup
+        onSetupSuccess={handleSetupSuccess}
+        onGoToLogin={() => setForceShowLogin(true)}
+        onBackToPublic={onBackToPublic}
+      />
+    );
   }
 
-  // 2. If admin exists but user is not logged in, show Admin Login
+  // 2. If admin exists or user navigated to login, show Admin Login
   if (!currentAdmin) {
     const adminPanelRoute = getAdminPanelRoute();
     return (
@@ -170,10 +184,16 @@ export function AdminLayout({ subRoute = 'default', onNavigateSubRoute, onBackTo
             </div>
             <h2 className="text-2xl font-bold font-display text-[#011c30]">Admin Portal Login</h2>
             <p className="text-xs text-slate-500">
-              Enter your credentials 
+              Enter your credentials to access the management portal
             </p>
           </div>
 
+          {loginSuccessNotice && (
+            <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-xs flex items-center gap-2">
+              <CheckCircle size={16} className="shrink-0 text-emerald-600" />
+              <span>{loginSuccessNotice}</span>
+            </div>
+          )}
 
           {loginError && (
             <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs flex items-center gap-2">
@@ -224,7 +244,53 @@ export function AdminLayout({ subRoute = 'default', onNavigateSubRoute, onBackTo
               {isLoggingIn ? <Loader2 size={18} className="animate-spin" /> : null}
               <span>Log In to Dashboard</span>
             </button>
+
+            {/* Quick Credentials Info & Autofill */}
+            <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs space-y-1.5 mt-2">
+              <div className="flex items-center justify-between text-[11px] text-slate-600 font-semibold">
+                <span>Master Credentials:</span>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setLoginEmail('admin@bucksnbricks.com');
+                      setLoginPassword('AdminPassword123!');
+                    }}
+                    className="text-[#052842] hover:underline font-bold cursor-pointer text-[11px]"
+                  >
+                    Use Master
+                  </button>
+                  <span>•</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setLoginEmail('azwarhussain001@gmail.com');
+                      setLoginPassword('AdminPassword123!');
+                    }}
+                    className="text-[#052842] hover:underline font-bold cursor-pointer text-[11px]"
+                  >
+                    Use User Email
+                  </button>
+                </div>
+              </div>
+              <div className="text-[11px] font-mono text-slate-700 bg-white p-2 rounded-lg border border-slate-100 space-y-0.5">
+                <div>Email: <span className="font-semibold text-slate-900">admin@bucksnbricks.com</span></div>
+                <div>Password: <span className="font-semibold text-slate-900">AdminPassword123!</span></div>
+              </div>
+            </div>
           </form>
+
+          {adminExists === false && (
+            <div className="text-center pt-2">
+              <button
+                type="button"
+                onClick={() => setForceShowLogin(false)}
+                className="text-xs font-semibold text-[#052842] hover:underline cursor-pointer"
+              >
+                ← Need first-time system setup? Create Super Admin
+              </button>
+            </div>
+          )}
 
           {onBackToPublic && (
             <div className="text-center pt-2 border-t border-slate-100">
@@ -314,6 +380,16 @@ export function AdminLayout({ subRoute = 'default', onNavigateSubRoute, onBackTo
             <span>Contact Messages</span>
           </button>
 
+          <button
+            onClick={() => setActiveTab('team-members')}
+            className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-colors cursor-pointer ${
+              activeTab === 'team-members' ? 'bg-white/15 text-white shadow-xs' : 'text-slate-300 hover:bg-white/5 hover:text-white'
+            }`}
+          >
+            <UserCheck size={18} />
+            <span>Team Members</span>
+          </button>
+
           {currentAdmin.role === 'SUPER_ADMIN' && (
             <button
               onClick={() => setActiveTab('settings')}
@@ -370,6 +446,8 @@ export function AdminLayout({ subRoute = 'default', onNavigateSubRoute, onBackTo
         {activeTab === 'resume-checker' && <ResumeCheckerManagement />}
 
         {activeTab === 'contacts' && <ContactMessagesManagement />}
+
+        {activeTab === 'team-members' && <TeamMembersManagement />}
 
         {activeTab === 'settings' && (
           <SettingsManagement

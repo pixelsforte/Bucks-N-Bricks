@@ -46,7 +46,7 @@ export function Footer({ onPageChange }: FooterProps) {
       'ceo',
       'impact',
       'privacy-policy',
-      'terms'
+      'terms',
     ];
     const pageName = href.replace('#', '');
 

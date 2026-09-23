@@ -159,10 +159,24 @@ export interface TimelineMilestone {
 
 export interface TeamMember {
   id: string;
+  _id?: string;
   name: string;
   role: string;
-  image: string;
-  bgColor: string;
+  bio?: string;
+  description?: string;
+  quote?: string;
+  qualification?: string;
+  image?: string;
+  picture?: string;
+  avatar?: string;
+  company?: string;
+  author?: string;
+  designation?: string;
+  bgColor?: string;
+  order?: number;
+  isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Testimonial {
