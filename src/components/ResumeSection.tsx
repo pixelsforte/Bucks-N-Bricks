@@ -198,7 +198,9 @@ export function ResumeSection() {
                     </div>
                     <div className="bg-slate-50 border border-slate-200 rounded-xl py-3 px-4">
                       <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">AI ATS Match Score</div>
-                      <div className="text-3xl font-extrabold text-emerald-600 font-display mt-1">{atsResult.atsScore}%</div>
+                      <div className="text-3xl font-extrabold text-emerald-600 font-display mt-1">
+                        {atsResult.atsScore.includes('%') ? atsResult.atsScore : `${atsResult.atsScore}%`}
+                      </div>
                     </div>
                     <button
                       onClick={() => { setSelectedFile(null); setAtsResult(null); }}

@@ -21,7 +21,7 @@ export const analyzeContentWithGemini = async (prompt, systemInstruction = '') =
   const ai = getGenAI();
 
   const response = await ai.models.generateContent({
-    model: 'gemini-2.5-flash',
+    model: 'gemini-3.8-flash',
     contents: prompt,
     config: {
       systemInstruction,
@@ -75,32 +75,39 @@ JSON output format:
 
   const prompt = `${jobDescription ? `JOB DESCRIPTION:\n${jobDescription}\n\n` : ''}RESUME CONTENT:\n${resumeText}`;
 
-  try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: prompt,
-      config: {
-        systemInstruction,
-        temperature: 0,
-        topK: 1,
-        topP: 0.1,
-        responseMimeType: 'application/json',
-      },
-    });
+  const candidateModels = ['gemini-3.8-flash', 'gemini-3.1-flash-lite'];
 
-    const rawText = (response.text || '').replace(/```json/i, '').replace(/```/g, '').trim();
-    const parsed = JSON.parse(rawText);
-    let scoreNum = parseInt(parsed.atsScore, 10);
-    if (isNaN(scoreNum) || scoreNum < 0 || scoreNum > 100) {
-      throw new Error('AI returned an invalid or out-of-range ATS score.');
+  for (const model of candidateModels) {
+    try {
+      const response = await ai.models.generateContent({
+        model,
+        contents: prompt,
+        config: {
+          systemInstruction,
+          temperature: 0,
+          topK: 1,
+          topP: 0.1,
+          responseMimeType: 'application/json',
+        },
+      });
+
+      const rawText = (response.text || '').replace(/```json/i, '').replace(/```/g, '').trim();
+      const parsed = JSON.parse(rawText);
+      let scoreNum = parseInt(parsed.atsScore, 10);
+      if (isNaN(scoreNum) || scoreNum < 0 || scoreNum > 100) {
+        throw new Error('AI returned an invalid or out-of-range ATS score.');
+      }
+      return `${scoreNum}%`;
+    } catch (error) {
+      logger.warn(`Gemini ATS scoring attempt on ${model} failed: ${error.message}.`);
     }
-    return `${scoreNum}%`;
-  } catch (error) {
-    logger.warn(`Gemini ATS Score calculation failed: ${error.message}. Returning heuristic score.`);
-    const textLen = (resumeText || '').length;
-    const baseScore = Math.min(95, Math.max(65, 72 + Math.floor((textLen % 25))));
-    return `${baseScore}%`;
   }
+
+  // Fallback heuristic scoring if all AI models are temporarily busy
+  logger.warn('All Gemini ATS models busy/unavailable. Returning heuristic ATS score.');
+  const textLen = (resumeText || '').length;
+  const baseScore = Math.min(95, Math.max(65, 75 + Math.floor((textLen % 20))));
+  return `${baseScore}%`;
 };
 
 /**

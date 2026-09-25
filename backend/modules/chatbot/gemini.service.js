@@ -200,25 +200,30 @@ CRITICAL OPERATIONAL & SECURITY MANDATES:
   }
   conversationPrompt += `\nCURRENT VISITOR QUESTION:\nVisitor: ${userMessage}\nAssistant:`;
 
-  try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: conversationPrompt,
-      config: {
-        systemInstruction,
-        temperature: 0.25,
-        topK: 10,
-        topP: 0.8,
-      },
-    });
+  const candidateModels = ['gemini-3.8-flash', 'gemini-3.1-flash-lite'];
 
-    const replyText = response.text ? response.text.trim() : null;
-    if (!replyText) {
-      throw new Error('Empty response from AI model');
+  for (const model of candidateModels) {
+    try {
+      const response = await ai.models.generateContent({
+        model,
+        contents: conversationPrompt,
+        config: {
+          systemInstruction,
+          temperature: 0.25,
+          topK: 10,
+          topP: 0.8,
+        },
+      });
+
+      const replyText = response.text ? response.text.trim() : null;
+      if (replyText) {
+        return replyText;
+      }
+    } catch (error) {
+      logger.warn(`❌ [GEMINI WARNING] Chatbot request on ${model} failed: ${error.message}.`);
     }
-    return replyText;
-  } catch (error) {
-    logger.warn(`❌ [GEMINI WARNING] Chatbot request failed: ${error.message}. Switching to fallback engine.`);
-    return getFallbackChatResponse(userMessage, jobs, websiteKnowledge);
   }
+
+  logger.warn(`❌ [GEMINI WARNING] All Gemini models busy. Switching to fallback engine.`);
+  return getFallbackChatResponse(userMessage, jobs, websiteKnowledge);
 };

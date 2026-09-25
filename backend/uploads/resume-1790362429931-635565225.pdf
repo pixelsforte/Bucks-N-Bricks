@@ -1,0 +1,26 @@
+
+Alex Mercer
+Senior Full Stack Engineer & Cloud Architect
+Email: alex.mercer@gmail.com | Phone: +1 415 555 2671 | San Francisco, CA | LinkedIn: /in/alexmercer
+
+PROFESSIONAL SUMMARY
+Results-driven Senior Full Stack Developer with 7 years of experience designing, developing, and deploying high-scale enterprise applications using React, Node.js, TypeScript, and MongoDB. Proven track record of improving application throughput and leading high-velocity engineering squads.
+
+CORE SKILLS
+- Frontend: React 19, TypeScript, Next.js, Redux Toolkit, Tailwind CSS
+- Backend: Node.js, Express.js, RESTful APIs, GraphQL, Microservices
+- Databases: MongoDB, PostgreSQL, Redis
+- DevOps & Cloud: Docker, Kubernetes, AWS (S3, EC2, Lambda), CI/CD GitHub Actions
+
+EXPERIENCE
+Lead Full Stack Engineer | Apex Cloud Solutions (2022 - Present)
+- Architected enterprise multi-tenant recruitment workflow platform handling 1.5M monthly applicants.
+- Reduced API response times by 38% through MongoDB aggregation pipelines and Redis caching.
+- Spearheaded migration of legacy monolith to containerized Docker microservices on AWS EKS.
+
+Senior Software Engineer | DataStream Labs (2019 - 2022)
+- Built interactive applicant tracking dashboards using React and TypeScript.
+- Implemented automated test suites with Jest and Cypress achieving 92% coverage.
+
+EDUCATION
+Bachelor of Science in Computer Science - University of California, Berkeley (2015 - 2019)
