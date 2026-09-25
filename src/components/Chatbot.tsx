@@ -76,7 +76,7 @@ export function Chatbot() {
       const assistantMsg: ChatMessageItem = {
         id: `bot-${Date.now()}`,
         role: 'assistant',
-        content: res.reply || "I am here to help you with Bugs n Bricks recruitment services and job openings.",
+        content: res.reply || "I am here to help you with bucks n Bricks recruitment services and job openings.",
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
 
@@ -169,7 +169,7 @@ export function Chatbot() {
           <div className="w-7 h-7 rounded-full bg-sky-100 text-[#0284c7] flex items-center justify-center shrink-0">
             <Bot size={18} />
           </div>
-          <img src={LOGO_SRC} alt="Bugs n Bricks" className="h-6 w-auto object-contain" />
+          <img src={LOGO_SRC} alt="bucks n Bricks" className="h-6 w-auto object-contain" />
         </button>
       )}
 
@@ -182,7 +182,7 @@ export function Chatbot() {
               <div className="w-7 h-7 rounded-full bg-sky-100 text-[#0284c7] flex items-center justify-center shrink-0">
                 <Bot size={18} />
               </div>
-              <img src={LOGO_SRC} alt="Bugs n Bricks" className="h-7 w-auto object-contain" />
+              <img src={LOGO_SRC} alt="bucks n Bricks" className="h-7 w-auto object-contain" />
             </div>
 
             <div className="flex items-center gap-1">
