@@ -111,7 +111,7 @@ export const createJob = asyncHandler(async (req, res) => {
       education: education || '',
       salary: salary || '',
       applicationDeadline: applicationDeadline ? new Date(applicationDeadline) : null,
-      status: status || 'Draft',
+      status: status || 'Published',
       createdBy: creatorId,
     });
 

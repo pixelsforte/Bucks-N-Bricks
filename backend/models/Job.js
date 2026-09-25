@@ -90,7 +90,7 @@ const jobSchema = new mongoose.Schema(
         values: JOB_STATUSES,
         message: '{VALUE} is not a valid job status',
       },
-      default: 'Draft',
+      default: 'Published',
     },
     createdBy: {
       type: mongoose.Schema.Types.Mixed,

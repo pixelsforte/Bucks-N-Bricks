@@ -30,7 +30,7 @@ export function VacancyFormModal({
   const [salary, setSalary] = useState('');
   const [applicationDeadline, setApplicationDeadline] = useState('');
   const [description, setDescription] = useState('');
-  const [status, setStatus] = useState<'Draft' | 'Published' | 'Closed'>('Draft');
+  const [status, setStatus] = useState<'Draft' | 'Published' | 'Closed'>('Published');
 
   // Dynamic Array Fields
   const [responsibilities, setResponsibilities] = useState<string[]>(['']);
@@ -98,7 +98,7 @@ export function VacancyFormModal({
     setSalary('');
     setApplicationDeadline('');
     setDescription('');
-    setStatus('Draft');
+    setStatus('Published');
     setResponsibilities(['']);
     setRequirements(['']);
     setPerksAndBenefits(['']);
