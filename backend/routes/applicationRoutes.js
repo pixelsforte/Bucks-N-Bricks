@@ -16,6 +16,9 @@ const router = Router();
  * PUBLIC APPLICATION ROUTES (No login required)
  */
 
+// Route: POST /api/v1/applications (Root alias)
+router.post('/', upload.single('resume'), applyForJob);
+
 // Route: POST /api/v1/applications/apply (jobId in form field or body)
 router.post('/apply', upload.single('resume'), applyForJob);
 
