@@ -65,14 +65,14 @@ export function JobDetailPage({ jobId = '1', onBack }: JobDetailPageProps) {
           console.warn('API request for job details unavailable, checking real vacancies dataset:', err);
         }
       }
-      // Fallback to realVacancies if backend API fails or returned no record
+      // Fallback only if the exact jobId matches a pre-existing record
       if (isMounted) {
-        const found = realVacancies.find((v) => v.id === jobId || v._id === jobId) || realVacancies[0];
+        const found = realVacancies.find((v) => v.id === jobId || v._id === jobId);
         if (found) {
           setJobData(found);
           setFetchError('');
         } else {
-          setFetchError('Job vacancy details unavailable.');
+          setFetchError('Job vacancy details unavailable or this position has been closed.');
         }
         setLoading(false);
       }

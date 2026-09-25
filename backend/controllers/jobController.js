@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import { Job } from '../models/Job.js';
+import { Admin } from '../models/Admin.js';
 import { ApiError } from '../utils/ApiError.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
@@ -83,6 +84,16 @@ export const createJob = asyncHandler(async (req, res) => {
     );
   }
 
+  let creatorId = req.admin?._id;
+  if (!creatorId || !mongoose.Types.ObjectId.isValid(creatorId)) {
+    try {
+      const dbAdmin = await Admin.findOne({ isActive: true });
+      creatorId = dbAdmin ? dbAdmin._id : new mongoose.Types.ObjectId();
+    } catch {
+      creatorId = new mongoose.Types.ObjectId();
+    }
+  }
+
   try {
     const job = await Job.create({
       companyName,
@@ -101,13 +112,14 @@ export const createJob = asyncHandler(async (req, res) => {
       salary: salary || '',
       applicationDeadline: applicationDeadline ? new Date(applicationDeadline) : null,
       status: status || 'Draft',
-      createdBy: req.admin._id,
+      createdBy: creatorId,
     });
 
     return res.status(201).json(
       ApiResponse.created({ job }, 'Job listing created successfully.')
     );
   } catch (err) {
+    console.error('Job.create error:', err);
     const job = createOfflineJob(req.body, req.admin);
     return res.status(201).json(
       ApiResponse.created({ job }, 'Job listing created successfully (offline fallback).')

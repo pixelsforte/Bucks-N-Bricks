@@ -14,122 +14,7 @@ export const initOfflineData = () => {
   global._offlineInitialized = true;
 
   if (!global.offlineJobs) {
-    global.offlineJobs = [
-      {
-        _id: 'offline-job-101',
-        id: 'offline-job-101',
-        companyName: 'Bucks & Bricks Co.',
-        jobTitle: 'Senior Full Stack Engineer (React/Node)',
-        category: 'Engineering & Tech',
-        city: 'Karachi',
-        country: 'Pakistan',
-        workplaceType: 'Hybrid',
-        employmentType: 'Full Time',
-        description: 'We are seeking an experienced Full Stack Engineer to build and scale our modern web applications and AI-driven recruitment portal. You will work across React, TypeScript, Node.js, and cloud services.',
-        responsibilities: [
-          'Design and develop high-performance frontend interfaces using React and Tailwind CSS.',
-          'Build robust REST APIs and microservices using Node.js and Express.',
-          'Collaborate with cross-functional teams to define architecture and deliver scalable features.',
-          'Implement automated CI/CD pipelines and ensure rigorous code quality standards.'
-        ],
-        requirements: [
-          '4+ years of professional full stack web development experience.',
-          'Strong proficiency in TypeScript, React, Node.js, and modern CSS frameworks.',
-          'Experience working with RESTful APIs, authentication workflows, and cloud databases.',
-          'Excellent communication skills and ability to work in an agile environment.'
-        ],
-        perksAndBenefits: [
-          'Competitive salary package with annual performance bonuses.',
-          'Comprehensive health and medical insurance for self and family.',
-          'Flexible hybrid working arrangements and generous paid time off.',
-          'Annual professional development and learning stipend.'
-        ],
-        experienceRequired: '4-6 Years',
-        education: 'Bachelor’s Degree in Computer Science or equivalent practical experience',
-        salary: 'PKR 350,000 - 450,000 / month',
-        applicationDeadline: new Date(Date.now() + 86400000 * 30),
-        status: 'Published',
-        createdAt: new Date(Date.now() - 86400000 * 5),
-        updatedAt: new Date(Date.now() - 86400000 * 5),
-        createdBy: { _id: 'offline-1785085105862', name: 'Super Admin', email: 'admin@bucksnbricks.com', role: 'SUPER_ADMIN' }
-      },
-      {
-        _id: 'offline-job-102',
-        id: 'offline-job-102',
-        companyName: 'Bucks & Bricks Co.',
-        jobTitle: 'AI Recruitment & HR Lead',
-        category: 'Human Resources',
-        city: 'Lahore',
-        country: 'Pakistan',
-        workplaceType: 'On-Site',
-        employmentType: 'Full Time',
-        description: 'Join our team as the AI Recruitment & HR Lead to revolutionize talent sourcing and executive search. You will leverage cutting-edge AI ATS tools and lead end-to-end recruitment pipelines.',
-        responsibilities: [
-          'Manage end-to-end recruitment lifecycles for executive and technical roles.',
-          'Utilize AI-assisted resume screening and candidate evaluation platforms.',
-          'Partner with hiring managers to build talent benchmarks and job descriptions.',
-          'Enhance employer branding and candidate engagement strategies.'
-        ],
-        requirements: [
-          '5+ years of talent acquisition or HR management experience.',
-          'Demonstrated success hiring technical and executive talent in competitive markets.',
-          'Familiarity with ATS software, resume parsing tools, and structured interviewing.',
-          'Strong negotiation, interpersonal, and stakeholder management skills.'
-        ],
-        perksAndBenefits: [
-          'Market-leading compensation with generous placement commissions.',
-          'Health, dental, and life insurance coverage.',
-          'Modern office environment with catered lunches and wellness programs.',
-          'Opportunity for rapid career growth into Head of People Operations.'
-        ],
-        experienceRequired: '5+ Years',
-        education: 'Bachelor’s or Master’s in Human Resources, Business, or Psychology',
-        salary: 'PKR 280,000 - 380,000 / month',
-        applicationDeadline: new Date(Date.now() + 86400000 * 20),
-        status: 'Published',
-        createdAt: new Date(Date.now() - 86400000 * 3),
-        updatedAt: new Date(Date.now() - 86400000 * 3),
-        createdBy: { _id: 'offline-1785085105862', name: 'Super Admin', email: 'admin@bucksnbricks.com', role: 'SUPER_ADMIN' }
-      },
-      {
-        _id: 'offline-job-103',
-        id: 'offline-job-103',
-        companyName: 'Bucks & Bricks Co.',
-        jobTitle: 'Senior Product Designer (UI/UX)',
-        category: 'Design & Product',
-        city: 'Islamabad',
-        country: 'Pakistan',
-        workplaceType: 'Remote',
-        employmentType: 'Full Time',
-        description: 'We are looking for an innovative Senior Product Designer to craft intuitive, beautiful user experiences across our digital products and client dashboards.',
-        responsibilities: [
-          'Create user flows, wireframes, prototypes, and high-fidelity visual designs.',
-          'Conduct user research, usability testing, and translate insights into design solutions.',
-          'Maintain and expand our design system using Figma and component libraries.',
-          'Collaborate closely with engineers to ensure pixel-perfect implementation.'
-        ],
-        requirements: [
-          '3+ years of digital product design experience with a strong portfolio.',
-          'Mastery of Figma, interactive prototyping, and responsive web design principles.',
-          'Solid understanding of accessibility guidelines and user-centered design methodologies.',
-          'Ability to articulate design decisions clearly to technical and business stakeholders.'
-        ],
-        perksAndBenefits: [
-          '100% remote working flexibility with home office setup allowance.',
-          'Competitive compensation package in USD/PKR equivalent.',
-          'Flexible working hours and result-oriented culture.',
-          'Annual international conference and workshop allowances.'
-        ],
-        experienceRequired: '3-5 Years',
-        education: 'Degree in Design, HCI, or relevant practical portfolio experience',
-        salary: 'PKR 300,000 - 400,000 / month',
-        applicationDeadline: new Date(Date.now() + 86400000 * 45),
-        status: 'Published',
-        createdAt: new Date(Date.now() - 86400000 * 1),
-        updatedAt: new Date(Date.now() - 86400000 * 1),
-        createdBy: { _id: 'offline-1785085105862', name: 'Super Admin', email: 'admin@bucksnbricks.com', role: 'SUPER_ADMIN' }
-      }
-    ];
+    global.offlineJobs = [];
   }
 
   if (!global.offlineApplications || global.offlineApplications.length === 0) {
@@ -679,6 +564,16 @@ export const getOfflineAdminsList = () => {
     {
       _id: 'offline-1785085105862',
       id: 'offline-1785085105862',
+      name: 'Super Admin',
+      email: 'admin@gmail.com',
+      password: 'AdminPassword123!',
+      role: 'SUPER_ADMIN',
+      isActive: true,
+      createdAt: new Date(),
+    },
+    {
+      _id: 'offline-1785085105863',
+      id: 'offline-1785085105863',
       name: 'Super Admin',
       email: 'admin@bucksnbricks.com',
       password: 'AdminPassword123!',

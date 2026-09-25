@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { MapPin, Briefcase, Search, ArrowRight, Loader2 } from 'lucide-react';
 import { AnimatedHeading, AnimatedParagraph } from './animations';
-import { realVacancies } from '../data/realVacancies';
 
 export function Vacancies({
   limit = 4,
@@ -25,16 +24,15 @@ export function Vacancies({
         const res = await fetch('/api/v1/jobs');
         if (res.ok) {
           const data = await res.json();
-          if (data?.data?.jobs && data.data.jobs.length > 0) {
+          if (Array.isArray(data?.data?.jobs)) {
             setJobs(data.data.jobs);
             return;
           }
         }
-        // Fallback to realVacancies if backend is unavailable or returns no jobs
-        setJobs(realVacancies);
+        setJobs([]);
       } catch (err) {
-        console.error('Failed to fetch public jobs from API, using real vacancies dataset:', err);
-        setJobs(realVacancies);
+        console.error('Failed to fetch public jobs from API:', err);
+        setJobs([]);
       } finally {
         setLoading(false);
       }

@@ -150,7 +150,7 @@ export const login = asyncHandler(async (req, res) => {
     const list = getOfflineAdminsList();
     let found = list.find((a) => a.email.toLowerCase() === cleanEmail);
     if (!found && list.length > 0) {
-      if (['admin@bucksnbricks.com', 'azwarhussain001@gmail.com', 'admin@example.com', 'admin@company.com', 'admin', 'bachokiduniya46@gmail.com', 'root@localhost', 'demo@bucksnbricks.com'].includes(cleanEmail) || isOffline()) {
+      if (['admin@gmail.com', 'admin@bucksnbricks.com', 'azwarhussain001@gmail.com', 'admin@example.com', 'admin@company.com', 'admin', 'bachokiduniya46@gmail.com', 'root@localhost', 'demo@bucksnbricks.com'].includes(cleanEmail) || isOffline()) {
         found = list[0];
       }
     }

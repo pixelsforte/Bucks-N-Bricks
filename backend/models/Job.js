@@ -93,9 +93,9 @@ const jobSchema = new mongoose.Schema(
       default: 'Draft',
     },
     createdBy: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.Mixed,
       ref: 'Admin',
-      required: [true, 'Admin reference is required for job creation'],
+      required: false,
     },
   },
   {

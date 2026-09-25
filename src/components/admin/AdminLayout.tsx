@@ -209,7 +209,7 @@ export function AdminLayout({ subRoute = 'default', onNavigateSubRoute, onBackTo
                 type="email"
                 value={loginEmail}
                 onChange={(e) => setLoginEmail(e.target.value)}
-                placeholder="admin@bucksnbricks.com"
+                placeholder="admin@gmail.com"
                 className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm font-sans focus:outline-none focus:border-[#052842]"
                 required
               />
@@ -244,9 +244,6 @@ export function AdminLayout({ subRoute = 'default', onNavigateSubRoute, onBackTo
               {isLoggingIn ? <Loader2 size={18} className="animate-spin" /> : null}
               <span>Log In to Dashboard</span>
             </button>
-
-            {/* Quick Credentials Info & Autofill */}
-          
           </form>
 
           {adminExists === false && (
