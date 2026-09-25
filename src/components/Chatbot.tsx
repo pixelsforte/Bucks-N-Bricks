@@ -22,7 +22,7 @@ export function Chatbot() {
     {
       id: 'welcome-1',
       role: 'assistant',
-      content: "Hello! Welcome to **Bugs n Bricks**.\n\nHow can I help you today? You can ask about our published job vacancies, recruitment services, or AI resume evaluation.",
+      content: "Hello! Welcome to **Bucks n Bricks**.\n\nHow can I help you today? You can ask about our published job vacancies, recruitment services, or AI resume evaluation.",
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
   ]);
