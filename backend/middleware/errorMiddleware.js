@@ -8,10 +8,16 @@ import { logger } from '../utils/logger.js';
 export const errorMiddleware = (err, req, res, next) => {
   let error = err;
 
-  // Log error stack for debugging
-  logger.error(`Error processing ${req.method} ${req.url}: ${err.message}`, {
-    stack: err.stack,
-  });
+  const isClientError = (err.statusCode && err.statusCode < 500) || err.name === 'CastError';
+
+  // Only log full error stack for actual 5xx internal server errors
+  if (!isClientError) {
+    logger.error(`Error processing ${req.method} ${req.url}: ${err.message}`, {
+      stack: err.stack,
+    });
+  } else {
+    logger.warn(`Notice (${err.statusCode || 400}) ${req.method} ${req.url}: ${err.message}`);
+  }
 
   // Handle Mongoose CastError (Invalid ObjectId)
   if (err.name === 'CastError') {
