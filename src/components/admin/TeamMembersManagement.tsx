@@ -23,10 +23,14 @@ import {
   deleteTeamMember,
 } from '../../services/api';
 
-// Only allow safe image sources (local preview, uploaded files, http/https images)
+// Only allow safe image sources (local preview or http/https images).
+// Returns '' for anything else, so the preview just stays empty.
 const getSafeImageSrc = (src: string): string => {
   if (!src) return '';
-  if (src.startsWith('blob:') || src.startsWith('data:image/')) return src;
+  if (src.startsWith('blob:')) {
+    // Object URLs made from the chosen file, e.g. blob:https://site/uuid
+    return /^blob:https?:\/\/[\w.:-]+\/[\w-]+$/.test(src) ? src : '';
+  }
   try {
     const url = new URL(src, window.location.origin);
     if (url.protocol === 'http:' || url.protocol === 'https:') return url.href;
@@ -462,10 +466,11 @@ export function TeamMembersManagement() {
                   <div className="flex items-center gap-4">
                     <div className="w-16 h-16 rounded-full overflow-hidden bg-slate-100 border-2 border-slate-200 flex items-center justify-center shrink-0">
                       {formImagePreview ? (
-                        <img
-                          src={getSafeImageSrc(formImagePreview)}
-                          alt="Preview"
-                          className="w-full h-full object-cover"
+                        <div
+                          role="img"
+                          aria-label="Preview"
+                          className="w-full h-full bg-cover bg-center"
+                          style={{ backgroundImage: `url("${getSafeImageSrc(formImagePreview)}")` }}
                         />
                       ) : (
                         <User size={28} className="text-slate-400" />
