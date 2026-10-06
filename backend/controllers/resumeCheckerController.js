@@ -3,6 +3,7 @@ import fs from 'fs';
 import mongoose from 'mongoose';
 import { ResumeChecker } from '../models/ResumeChecker.js';
 import { ApiError } from '../utils/ApiError.js';
+import { safeSearchRegex } from '../utils/escapeRegex.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { extractTextFromResume } from '../services/resumeParserService.js';
@@ -91,9 +92,9 @@ export const getAllResumeCheckerRecords = asyncHandler(async (req, res) => {
     const { search, atsScore, minScore, maxScore, startDate, endDate, sort } = req.query;
     const query = {};
 
-    if (search && search.trim()) query.resumeFileName = new RegExp(search.trim(), 'i');
+    if (search && search.trim()) query.resumeFileName = safeSearchRegex(search);
     if (atsScore && atsScore.trim()) {
-      query.atsScore = new RegExp(atsScore.trim(), 'i');
+      query.atsScore = safeSearchRegex(atsScore);
     } else if (minScore || maxScore) {
       const conditions = [];
       if (minScore) conditions.push(`this.atsScore && parseInt(this.atsScore) >= ${parseInt(minScore, 10)}`);
