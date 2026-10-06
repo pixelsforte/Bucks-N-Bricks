@@ -3,6 +3,7 @@ import path from 'path';
 import mongoose from 'mongoose';
 import { TeamMember } from '../models/TeamMember.js';
 import { ApiError } from '../utils/ApiError.js';
+import { safeSearchRegex } from '../utils/escapeRegex.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import {
@@ -20,12 +21,15 @@ import {
 const cleanupLocalImage = (imagePath) => {
   if (!imagePath || typeof imagePath !== 'string') return;
   if (imagePath.startsWith('/uploads/')) {
-    const filename = imagePath.replace('/uploads/', '');
-    const fullPath = path.join(process.cwd(), 'backend', 'uploads', filename);
-    if (fs.existsSync(fullPath)) {
-      try {
-        fs.unlinkSync(fullPath);
-      } catch (err) {
+    const uploadsDir = path.resolve(process.cwd(), 'backend', 'uploads');
+    // basename() strips any ../ so the file can only be inside the uploads folder
+    const filename = path.basename(imagePath);
+    const fullPath = path.resolve(uploadsDir, filename);
+    if (!filename || !fullPath.startsWith(uploadsDir + path.sep)) return;
+    try {
+      fs.unlinkSync(fullPath);
+    } catch (err) {
+      if (err.code !== 'ENOENT') {
         console.warn('Could not remove file:', fullPath, err.message);
       }
     }
@@ -54,7 +58,7 @@ export const getTeamMembers = asyncHandler(async (req, res) => {
     query.isActive = true;
   }
   if (search) {
-    const regex = new RegExp(search.trim(), 'i');
+    const regex = safeSearchRegex(search);
     query.$or = [{ name: regex }, { role: regex }, { bio: regex }, { company: regex }];
   }
 
