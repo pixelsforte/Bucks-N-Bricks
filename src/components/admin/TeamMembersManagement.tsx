@@ -23,6 +23,19 @@ import {
   deleteTeamMember,
 } from '../../services/api';
 
+// Only allow safe image sources (local preview, uploaded files, http/https images)
+const getSafeImageSrc = (src: string): string => {
+  if (!src) return '';
+  if (src.startsWith('blob:') || src.startsWith('data:image/')) return src;
+  try {
+    const url = new URL(src, window.location.origin);
+    if (url.protocol === 'http:' || url.protocol === 'https:') return url.href;
+  } catch {
+    // invalid URL
+  }
+  return '';
+};
+
 export function TeamMembersManagement() {
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -450,7 +463,7 @@ export function TeamMembersManagement() {
                     <div className="w-16 h-16 rounded-full overflow-hidden bg-slate-100 border-2 border-slate-200 flex items-center justify-center shrink-0">
                       {formImagePreview ? (
                         <img
-                          src={formImagePreview}
+                          src={getSafeImageSrc(formImagePreview)}
                           alt="Preview"
                           className="w-full h-full object-cover"
                         />
