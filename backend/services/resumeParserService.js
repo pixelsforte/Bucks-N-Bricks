@@ -1,4 +1,5 @@
 import fs from 'fs';
+import path from 'path';
 import mammoth from 'mammoth';
 import * as pdfParseModule from 'pdf-parse';
 import { logger } from '../utils/logger.js';
@@ -20,7 +21,13 @@ export const extractTextFromResume = async (file) => {
   const ext = originalname.split('.').pop().toLowerCase();
 
   try {
-    const fileBuffer = fs.readFileSync(filePath);
+    // Only read files that live inside the uploads folder
+    const uploadsDir = path.resolve(process.cwd(), 'backend', 'uploads');
+    const resolvedPath = path.resolve(filePath);
+    if (!resolvedPath.startsWith(uploadsDir + path.sep)) {
+      throw ApiError.badRequest('Invalid resume file location.');
+    }
+    const fileBuffer = fs.readFileSync(resolvedPath);
 
     // 1. PDF Text Extraction
     if (ext === 'pdf' || mimetype === 'application/pdf') {
