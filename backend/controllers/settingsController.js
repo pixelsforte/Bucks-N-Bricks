@@ -1,5 +1,6 @@
 import { Admin } from '../models/Admin.js';
 import { ApiError } from '../utils/ApiError.js';
+import { isValidEmail } from '../utils/emailValidator.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { isOffline, getOfflineAdminsList } from '../utils/offlineFallback.js';
@@ -158,8 +159,7 @@ export const changeEmail = asyncHandler(async (req, res) => {
   if (!currentPassword) throw ApiError.badRequest('Current password is required to change email address.');
   if (!targetEmail) throw ApiError.badRequest('New email address is required.');
 
-  const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
-  if (!emailRegex.test(targetEmail.trim())) throw ApiError.badRequest('Please provide a valid new email address.');
+  if (!isValidEmail(targetEmail)) throw ApiError.badRequest('Please provide a valid new email address.');
   const formattedNewEmail = targetEmail.toLowerCase().trim();
 
   if (isOffline() || String(req.admin._id || req.admin.id || '').startsWith('offline-')) {
