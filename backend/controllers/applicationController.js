@@ -4,6 +4,8 @@ import mongoose from 'mongoose';
 import { Application, APPLICATION_STATUSES_ENUM } from '../models/Application.js';
 import { Job } from '../models/Job.js';
 import { ApiError } from '../utils/ApiError.js';
+import { isValidEmail } from '../utils/emailValidator.js';
+import { safeSearchRegex } from '../utils/escapeRegex.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { extractTextFromResume } from '../services/resumeParserService.js';
@@ -22,7 +24,11 @@ import {
  * PUBLIC JOB APPLICATION API WITH AUTOMATIC ATS RESUME SCORING
  */
 export const applyForJob = asyncHandler(async (req, res) => {
-  const jobId = req.body.jobId || req.params.jobId;
+  const rawJobId = req.body.jobId || req.params.jobId;
+  if (rawJobId && typeof rawJobId !== 'string' && typeof rawJobId !== 'number') {
+    throw ApiError.badRequest('Invalid job ID.');
+  }
+  const jobId = rawJobId ? String(rawJobId) : '';
 
   const {
     firstName,
@@ -46,8 +52,7 @@ export const applyForJob = asyncHandler(async (req, res) => {
   if (!lastName || !lastName.trim()) throw ApiError.badRequest('Last name is required.');
   if (!email || !email.trim()) throw ApiError.badRequest('Email is required.');
 
-  const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
-  if (!emailRegex.test(email.trim())) throw ApiError.badRequest('Please enter a valid email address.');
+  if (!isValidEmail(email)) throw ApiError.badRequest('Please enter a valid email address.');
   if (!phoneNumber || !phoneNumber.trim()) throw ApiError.badRequest('Phone number is required.');
   if (!country || !country.trim()) throw ApiError.badRequest('Country is required.');
   if (yearsOfExperience === undefined || yearsOfExperience === null || String(yearsOfExperience).trim() === '') throw ApiError.badRequest('Years of experience is required.');
@@ -84,7 +89,7 @@ export const applyForJob = asyncHandler(async (req, res) => {
   }
 
   try {
-    const job = await Job.findById(jobId);
+    const job = await Job.findById(new mongoose.Types.ObjectId(jobId));
     if (!job || job.status !== 'Published') throw ApiError.notFound('Job listing not found or is no longer open for applications.');
 
     const resumeText = await extractTextFromResume(req.file);
@@ -171,16 +176,16 @@ export const getAllApplications = asyncHandler(async (req, res) => {
 
     if (status && status.trim() && status.trim().toUpperCase() !== 'ALL') query.status = status.trim();
     const targetPosition = appliedPosition || jobTitle;
-    if (targetPosition && targetPosition.trim()) query.jobTitle = new RegExp(targetPosition.trim(), 'i');
+    if (targetPosition && targetPosition.trim()) query.jobTitle = safeSearchRegex(targetPosition);
     const targetCompany = company || companyName;
-    if (targetCompany && targetCompany.trim()) query.companyName = new RegExp(targetCompany.trim(), 'i');
+    if (targetCompany && targetCompany.trim()) query.companyName = safeSearchRegex(targetCompany);
     if (startDate || endDate) {
       query.createdAt = {};
       if (startDate) query.createdAt.$gte = new Date(startDate);
       if (endDate) query.createdAt.$lte = new Date(endDate);
     }
     if (search && search.trim()) {
-      const searchRegex = new RegExp(search.trim(), 'i');
+      const searchRegex = safeSearchRegex(search);
       query.$or = [
         { firstName: searchRegex },
         { lastName: searchRegex },
