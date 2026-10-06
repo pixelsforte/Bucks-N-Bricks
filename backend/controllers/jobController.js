@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import { Job } from '../models/Job.js';
 import { Admin } from '../models/Admin.js';
 import { ApiError } from '../utils/ApiError.js';
+import { safeSearchRegex } from '../utils/escapeRegex.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import {
@@ -36,7 +37,7 @@ const buildJobQuery = (queryParams, isPublic = false) => {
   }
 
   if (search && search.trim()) {
-    const searchRegex = new RegExp(search.trim(), 'i');
+    const searchRegex = safeSearchRegex(search);
     query.$or = [
       { companyName: searchRegex },
       { jobTitle: searchRegex },
