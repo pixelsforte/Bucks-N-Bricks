@@ -12,10 +12,28 @@ export const createApp = async () => {
   const app = express();
   app.set('trust proxy', 1);
 
-  // 1. Security Headers via Helmet
+  // 1. Security Headers via Helmet (Content-Security-Policy enabled)
+  const isProduction = process.env.NODE_ENV === 'production';
   app.use(
     helmet({
-      contentSecurityPolicy: false, // Disabled for Vite dev server compatibility
+      contentSecurityPolicy: {
+        useDefaults: true,
+        directives: {
+          defaultSrc: ["'self'"],
+          // Vite dev server needs inline/eval scripts; production stays strict
+          scriptSrc: isProduction ? ["'self'"] : ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+          styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+          fontSrc: ["'self'", 'https://fonts.gstatic.com', 'data:'],
+          imgSrc: ["'self'", 'data:', 'blob:', 'https:'],
+          // Vite hot-reload uses websockets in development
+          connectSrc: isProduction ? ["'self'"] : ["'self'", 'ws:', 'wss:'],
+          objectSrc: ["'none'"],
+          baseUri: ["'self'"],
+          formAction: ["'self'"],
+          frameAncestors: ["'self'"],
+          upgradeInsecureRequests: isProduction ? [] : null,
+        },
+      },
       crossOriginResourcePolicy: { policy: 'cross-origin' },
     })
   );
@@ -69,7 +87,17 @@ export const createApp = async () => {
 
   // 5. Static Uploads Folder
   const uploadsPath = path.join(process.cwd(), 'backend', 'uploads');
-  app.use('/uploads', express.static(uploadsPath));
+  const uploadsLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 1000,
+    standardHeaders: true,
+    legacyHeaders: false,
+    validate: {
+      xForwardedForHeader: false,
+      forwardedHeader: false,
+    },
+  });
+  app.use('/uploads', uploadsLimiter, express.static(uploadsPath));
 
   // 6. Basic Request Logging Middleware
   app.use((req, res, next) => {
@@ -81,7 +109,7 @@ export const createApp = async () => {
   app.use('/api/v1', apiV1Routes);
 
   // 8. 404 Route Not Found Handler for API endpoints
-  app.use('/api/*', notFoundMiddleware);
+  app.use('/api/*', limiter, notFoundMiddleware);
 
   // 9. Development Vite Integration / Production SPA
   if (process.env.NODE_ENV !== 'production') {
@@ -98,7 +126,17 @@ export const createApp = async () => {
   } else {
     const distPath = path.join(process.cwd(), 'dist');
     app.use(express.static(distPath));
-    app.get('*', (req, res) => {
+    const pageLimiter = rateLimit({
+      windowMs: 15 * 60 * 1000,
+      max: 300,
+      standardHeaders: true,
+      legacyHeaders: false,
+      validate: {
+        xForwardedForHeader: false,
+        forwardedHeader: false,
+      },
+    });
+    app.get('*', pageLimiter, (req, res) => {
       res.sendFile(path.join(distPath, 'index.html'));
     });
   }
