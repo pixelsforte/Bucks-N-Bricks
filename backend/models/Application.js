@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { isValidEmail } from '../utils/emailValidator.js';
 
 const APPLICATION_STATUSES = ['Pending', 'Reviewed', 'Shortlisted', 'Rejected', 'Hired'];
 
@@ -21,10 +22,10 @@ const applicationSchema = new mongoose.Schema(
       required: [true, 'Email is required'],
       lowercase: true,
       trim: true,
-      match: [
-        /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
-        'Please enter a valid email address',
-      ],
+      validate: {
+        validator: isValidEmail,
+        message: 'Please enter a valid email address',
+      },
     },
     phoneNumber: {
       type: String,
