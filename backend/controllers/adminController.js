@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import { Admin } from '../models/Admin.js';
 import { ADMIN_ROLES } from '../config/constants.js';
 import { ApiError } from '../utils/ApiError.js';
+import { isValidEmail } from '../utils/emailValidator.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import {
@@ -21,8 +22,7 @@ export const createSecondaryAdmin = asyncHandler(async (req, res) => {
   if (!name || !name.trim()) throw ApiError.badRequest('Name is required.');
   if (!email || !email.trim()) throw ApiError.badRequest('Email is required.');
 
-  const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
-  if (!emailRegex.test(email.trim())) throw ApiError.badRequest('Please enter a valid email address.');
+  if (!isValidEmail(email)) throw ApiError.badRequest('Please enter a valid email address.');
   if (!password) throw ApiError.badRequest('Password is required.');
   if (password.length < 6) throw ApiError.badRequest('Password must be at least 6 characters long.');
 
