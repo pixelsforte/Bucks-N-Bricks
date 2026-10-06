@@ -29,7 +29,9 @@ const getFallbackChatResponse = (userMessage, jobs, websiteKnowledge) => {
   }
 
   // 2. Exact Direct Job Queries (ONLY match explicit job opening requests, avoid trapping general company queries)
-  const isDirectJobQuery = /^(what|any|show|list|tell me about)?\s*(remote|hybrid|onsite|on-site|available|open|current)?\s*(jobs|vacancies|openings|positions|careers)\b/i.test(query) ||
+  // Cap length and collapse whitespace first so the pattern below cannot backtrack heavily
+  const compactQuery = query.slice(0, 200).replace(/\s+/g, ' ');
+  const isDirectJobQuery = /^(what|any|show|list|tell me about)? ?(remote|hybrid|onsite|on-site|available|open|current)? ?(jobs|vacancies|openings|positions|careers)\b/i.test(compactQuery) ||
                            query === 'jobs' || query === 'vacancies' || query === 'what jobs are available?' ||
                            query === 'latest jobs' || query === 'show jobs';
   if (isDirectJobQuery) {
